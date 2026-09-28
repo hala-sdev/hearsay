@@ -11,9 +11,9 @@ def wiki_search(title):
             if section.title not in ignored_sections:
                 data = section.text
                 if data:
-                    result.append(data)
+                    result.append({"article": title, "section": section.title, "text": data})
                 section_text(section, result)
-    result = [site.summary]
+    result = [{"article": title, "section": "Summary", "text": site.summary}]
     section_text(site, result)
 
     def remove_uncomlete_sent(chunk):
@@ -23,10 +23,10 @@ def wiki_search(title):
         return avg > 6
 
 
-    result = [chunk for chunk in result if remove_uncomlete_sent(chunk)]
+    result = [chunk for chunk in result if remove_uncomlete_sent(chunk["text"])]
     return result
 
-def pack_sentences(sentences, max_words=250, max_passages=20):
+def pack_sentences(sentences, max_words=250):
     packed = []
     Current = ""
     word_count = 0
@@ -41,31 +41,46 @@ def pack_sentences(sentences, max_words=250, max_passages=20):
     packed.append(Current)
     return [p.strip() for p in packed if p.strip()]
 
-def get_passages(title):
+def get_passages(title, max_passages=20):
     wiki_results = wiki_search(title)
     if not wiki_results:
         print(f"No results found for title: {title}")
         return []
     passages = []
-    for chunk in wiki_results:
-        sentences = sent_tokenize(chunk)
-        packed_sentences = pack_sentences(sentences, max_words=250, max_passages=20)
-        passages.extend(packed_sentences)
+    for record in wiki_results:
+        sentences = sent_tokenize(record["text"])
+        packed_sentences = pack_sentences(sentences, max_words=250)
+        for packed in packed_sentences:
+            passages.append({"article": record["article"], "section": record["section"], "text": packed})
+
+
     num_passages = len(passages)
-    sum_words = sum(len(s.split()) for s in passages)
-    largest = max(len(s.split()) for s in passages)
+    sum_words = sum(len(s["text"].split()) for s in passages)
+    largest = max(len(s["text"].split()) for s in passages)
     print(f"Title: {title}")
     print(f"Number of passages: {num_passages}")
     print(f"Total number of words: {sum_words}")
     print(f"Largest passage word count: {largest}\n\n")
-    return passages[:20]
+    return passages[:max_passages]
 
+def get_titles(sublist):
+    prefix =['Template talk:', 'Wikipedia:', 'Category:', 'Template:', 'User:']
+    page = wiki.page(f"Wikipedia:Vital articles/Level/4/{sublist}")
+    links = page.links
+    titles = []
+    for title in links.keys():
+        if not any(title.startswith(p) for p in prefix):
+            titles.append(title)
+    return titles
+            
+sections = ["Mathematics", "People", "History", "Geography", "Arts", "Philosophy and religion", "Everyday life", "Biological and health sciences", "Society and social sciences", "Physical sciences", "Technology"] 
+all_titles = []
+for s in sections:
+    titles = get_titles(s)
+    all_titles.extend(titles)
 
-passa = get_passages("France")
-passb = get_passages("Albert Einstein")
-passc = get_passages("Photosynthesis")
-passd = get_passages("make it boy")
-
-
+print(f"Distinct titles: {len(set(all_titles))}")
+colon_titles = [t for t in all_titles if ":" in t]
+print(len(colon_titles), colon_titles[:40])
 
 
