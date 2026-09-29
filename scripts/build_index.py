@@ -1,6 +1,6 @@
 import wikipediaapi
 from nltk.tokenize import sent_tokenize
-
+import re
 wiki = wikipediaapi.Wikipedia(user_agent='hearsay (https://github.com/hala-sdev?tab=repositories)', language='en', extract_format=wikipediaapi.ExtractFormat.WIKI)
 
 ignored_sections = ["See also", "References", "External links", "Further reading", "Notes"]
@@ -82,5 +82,9 @@ for s in sections:
 print(f"Distinct titles: {len(set(all_titles))}")
 colon_titles = [t for t in all_titles if ":" in t]
 print(len(colon_titles), colon_titles[:40])
+
+cnr = Counter()
+common = Counter(all_titles).most_common(20)
+print("Most common titles:", common)
 
 
