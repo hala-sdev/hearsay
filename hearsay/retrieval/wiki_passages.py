@@ -39,7 +39,12 @@ def pack_sentences(sentences, max_words=250):
             Current += " " + s
             word_count += len(s.split())
     packed.append(Current)
-    return [p.strip() for p in packed if p.strip()]
+    cleaned = [p.strip() for p in packed if p.strip()]
+    if len(cleaned) > 1 and len(cleaned[-1].split()) < 50:
+        cleaned[-2] += " " + cleaned[-1]
+        cleaned.pop()
+    
+    return cleaned
 
 def get_passages(title, max_passages=20):
     wiki_results = wiki_search(title)
@@ -53,12 +58,5 @@ def get_passages(title, max_passages=20):
         for i, packed in enumerate(packed_sentences):
             passages.append({"article": record["article"], "path": record["path"], "text": packed, 'id': str(uuid.uuid5(uuid.NAMESPACE_URL, (record["path"] + ' > ' +f'{i}')))})
 
-    num_passages = len(passages)
-    sum_words = sum(len(s["text"].split()) for s in passages)
-    largest = max(len(s["text"].split()) for s in passages)
-    print(f"Title: {title}")
-    print(f"Number of passages: {num_passages}")
-    print(f"Total number of words: {sum_words}")
-    print(f"Largest passage word count: {largest}\n\n")
     return passages[:max_passages]
             
