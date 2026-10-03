@@ -1,3 +1,5 @@
 google-genai
 python-dotenv
 groq
+nltk
+wikipedia-api
