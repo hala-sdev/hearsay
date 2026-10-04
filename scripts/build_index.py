@@ -6,7 +6,7 @@ import json
 import time
 import os
 
-client = QdrantClient(url=qdrant_url, api_key=qdrant_api)
+client = QdrantClient(url=qdrant_url, api_key=qdrant_api, timeout=60)
 
 collection_name = "wiki_passages"
 dense_embedding_model = "BAAI/bge-small-en-v1.5"   
