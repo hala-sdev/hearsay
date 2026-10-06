@@ -1,0 +1,329 @@
+[
+  {
+    "claim": "The Eiffel Tower is in Paris",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that the Eiffel Tower is located on the Champ de Mars in Paris, France.",
+    "cited": [
+      {
+        "id": "92ec526b-15c3-59aa-8db1-8cfaad684350",
+        "path": "Eiffel Tower > Summary",
+        "quote": "The Eiffel Tower (...) is a lattice tower on the Champ de Mars in Paris, France.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "The Eiffel Tower is in Rome",
+    "label": "REFUTES",
+    "reasoning": "The claim states that the Eiffel Tower is in Rome. However, the evidence clearly states that the Eiffel Tower is located in Paris, France.",
+    "cited": [
+      {
+        "id": "92ec526b-15c3-59aa-8db1-8cfaad684350",
+        "path": "Eiffel Tower > Summary",
+        "quote": "The Eiffel Tower (...) is a lattice tower on the Champ de Mars in Paris, France.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "The Amazon River is in Africa",
+    "label": "REFUTES",
+    "reasoning": "The claim states that the Amazon River is in Africa, but the evidence explicitly states that the Amazon River is in South America.",
+    "cited": [
+      {
+        "id": "0e4c5d4d-c72f-5741-996d-b9dcae2b6eca",
+        "path": "Wetland > Ecosystem services > Storage reservoirs and flood protection",
+        "quote": "Amazon River (South America)",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "World War II ended in 1945",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence states that World War II ended in 1945, referencing the armistice of 15 August 1945, the surrender documents in 1945, and defining the war span as 1 September 1939 – 2 September 1945.",
+    "cited": [
+      {
+        "id": "7c8af284-4cd9-5fd7-9fc6-9fcf482567af",
+        "path": "World War II > Summary",
+        "quote": "(1 September 1939 – 2 September 1945)",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "World War II ended in 1946",
+    "label": "REFUTES",
+    "reasoning": "The claim states that World War II ended in 1946. However, the evidence explicitly states that World War II lasted from 1 September 1939 to 2 September 1945.",
+    "cited": [
+      {
+        "id": "7c8af284-4cd9-5fd7-9fc6-9fcf482567af",
+        "path": "World War II > Summary",
+        "quote": "World War II, or the Second World War (1 September 1939 – 2 September 1945)",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "Mount Everest is over 8,000 metres tall",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that Mount Everest has a height of 8,848.86 metres (and other measurements around 8,844 to 8,850 metres), which confirms that it is indeed over 8,000 metres tall.",
+    "cited": [
+      {
+        "id": "783d3a8b-528e-5367-82b8-2bc9b542c8b9",
+        "path": "Mount Everest > Summary",
+        "quote": "height was most recently measured in 2020 through a joint survey by Nepalese and Chinese authorities as 8,848.86 m (29,031 ft 8+1⁄2 in).",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Marie Curie won Nobel Prizes in two different sciences",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence explicitly states that Marie Curie won the 1903 Nobel Prize in Physics and the 1911 Nobel Prize in Chemistry, making her the only person to win a Nobel Prize in two different scientific fields.",
+    "cited": [
+      {
+        "id": "ca46c2f3-f6fd-5978-a5f7-cb73447eba11",
+        "path": "Marie Curie > Summary",
+        "quote": "She shared the 1903 Nobel Prize in Physics (...) She won the 1911 Nobel Prize in Chemistry",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Apollo 11 landed on the Moon in 1969",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that the first crewed mission to land on the Moon was Apollo 11 in 1969.",
+    "cited": [
+      {
+        "id": "4611a31f-da9f-5e48-a62b-5fd086f491ae",
+        "path": "Moon landing > Summary",
+        "quote": "the first crewed mission to land on the Moon was Apollo 11 in 1969.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "William Shakespeare wrote Hamlet",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence explicitly states that Hamlet is a tragedy written by William Shakespeare between 1599 and 1601.",
+    "cited": [
+      {
+        "id": "e14c34b2-4b10-5677-9470-945521df57da",
+        "path": "Hamlet > Summary",
+        "quote": "The Tragedy of Hamlet, Prince of Denmark, often shortened to Hamlet (), is a tragedy written by William Shakespeare sometime between 1599 and 1601.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "The Pacific Ocean is the smallest ocean on Earth",
+    "label": "REFUTES",
+    "reasoning": "The claim states that the Pacific Ocean is the smallest ocean on Earth. However, the evidence clearly states that the Pacific Ocean is the largest ocean division (e.g., 'the Pacific Ocean is the largest and deepest of Earth's five oceanic divisions' and 'from largest to smallest' listing the Pacific first). Therefore, the claim is refuted by the evidence.",
+    "cited": [
+      {
+        "id": "e09f4e0c-4472-5854-aa6e-fd989c973837",
+        "path": "Pacific Ocean > Summary",
+        "quote": "The Pacific Ocean is the largest and deepest of Earth's five oceanic divisions.",
+        "verified": true
+      },
+      {
+        "id": "47ddea09-4bf8-5edd-a06f-faea7cb49abf",
+        "path": "Earth > Composition and structure > Surface",
+        "quote": "The world ocean is commonly divided into the Pacific Ocean, Atlantic Ocean, Indian Ocean, Southern Ocean, and Arctic Ocean, from largest to smallest.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "Photosynthesis releases oxygen",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence explicitly states that oxygenic photosynthesis is a process that releases oxygen (Passage 1: \"The term photosynthesis usually refers to oxygenic photosynthesis, a process that releases oxygen as a byproduct of water splitting.\"). Furthermore, Passage 2 states that \"In plants, algae, and cyanobacteria, photosynthesis releases oxygen.\"",
+    "cited": [
+      {
+        "id": "c8cd0b28-9d01-5c69-861e-9a5b9c07f364",
+        "path": "Photosynthesis > Summary",
+        "quote": "oxygenic photosynthesis, a process that releases oxygen as a byproduct of water splitting.",
+        "verified": true
+      },
+      {
+        "id": "b794489a-804d-567e-b270-a0e0a0317ee8",
+        "path": "Photosynthesis > Overview",
+        "quote": "In plants, algae, and cyanobacteria, photosynthesis releases oxygen.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Water boils at 50 degrees Celsius at sea level",
+    "label": "REFUTES",
+    "reasoning": "The claim states that water boils at 50 degrees Celsius at sea level. However, the evidence clearly states that the boiling point of water is 100 °C at sea level.",
+    "cited": [
+      {
+        "id": "48fab389-4f5f-5c39-a378-46ef922a6eb3",
+        "path": "Boiling > Uses > In cooking",
+        "quote": "The boiling point of water is typically considered to be 100 °C (212 °F; 373 K), especially at sea level.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "Leonardo da Vinci painted the Mona Lisa",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that the Mona Lisa is a portrait painting by Leonardo da Vinci.",
+    "cited": [
+      {
+        "id": "ffd20daf-2a5a-5a2a-a9e8-3abfa0829148",
+        "path": "Mona Lisa > Summary",
+        "quote": "The Mona Lisa is a half-length portrait painting by the Italian artist Leonardo da Vinci.",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "The Berlin Wall fell in 1989",
+    "label": "SUPPORTS",
+    "reasoning": "The claim states that the Berlin Wall fell in 1989. Passage 1 states, 'the East German government announced on 9 November 1989 that all GDR citizens could visit the FRG and West Berlin... The fall of the Berlin Wall paved the way for German reunification'. Passage 2 similarly states, 'In 1989... the Berlin Wall fell on 9 November'. Therefore, the evidence clearly supports the claim.",
+    "cited": [
+      {
+        "id": "0b24a0c3-ecec-5aaf-bc0d-708c2cdb3ab4",
+        "path": "Berlin Wall > Summary",
+        "quote": "the East German government announced on 9 November 1989 that all GDR citizens could visit the FRG and West Berlin.",
+        "verified": true
+      },
+      {
+        "id": "49238588-a800-5d5e-a3c2-731ff56f278c",
+        "path": "Berlin > History > 1946–Present",
+        "quote": "In 1989, with the end of the Cold War and pressure from the East German population, the Berlin Wall fell on 9 November",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Albert Einstein won the Nobel Prize for the theory of relativity",
+    "label": "REFUTES",
+    "reasoning": "The claim states that Albert Einstein won the Nobel Prize for the theory of relativity. However, the evidence clearly states that he was awarded the Nobel Prize for his services to theoretical physics, and especially for his discovery of the law of the photoelectric effect.",
+    "cited": [
+      {
+        "id": "14eb9e67-58f2-5bf3-bd9c-790bb79e91e8",
+        "path": "Albert Einstein > Life and career > Academic career in Europe (1908–1933)",
+        "quote": "he was awarded the 1921 Nobel Prize in Physics \"for his services to Theoretical Physics, and especially for his discovery of the law of the photoelectric effect\".",
+        "verified": true
+      }
+    ],
+    "retried": false,
+    "first_pass": null,
+    "expected": "REFUTES"
+  },
+  {
+    "claim": "Hollow Knight was developed by Team Cherry",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that Hollow Knight is a video game developed and published by Team Cherry.",
+    "cited": [
+      {
+        "id": "15f920bb-da22-567a-897e-3b5a4c0609e6",
+        "path": "Hollow Knight > Summary",
+        "quote": "Hollow Knight is a 2017 Metroidvania video game developed and published by Australian independent development studio Team Cherry.",
+        "verified": true
+      }
+    ],
+    "retried": true,
+    "first_pass": {
+      "claim": "Hollow Knight was developed by Team Cherry",
+      "label": "NOT ENOUGH INFO",
+      "reasoning": "The provided passages discuss rivets, Final Fantasy, The Legend of Zelda, and daggers. None of the passages contain any information about the video game Hollow Knight or its developer, Team Cherry.",
+      "cited": [],
+      "retried": false,
+      "first_pass": null
+    },
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Genshin Impact is a game developed by miHoYo",
+    "label": "SUPPORTS",
+    "reasoning": "The evidence clearly states that Genshin Impact is an action role-playing video game developed and published by miHoYo.",
+    "cited": [
+      {
+        "id": "b21d3125-c364-5b09-a4b3-1f0937cc7036",
+        "path": "Genshin Impact > Summary",
+        "quote": "Genshin Impact (...) is a 2020 action role-playing video game developed and published by miHoYo.",
+        "verified": true
+      }
+    ],
+    "retried": true,
+    "first_pass": {
+      "claim": "Genshin Impact is a game developed by miHoYo",
+      "label": "NOT ENOUGH INFO",
+      "reasoning": "The provided passages mention Genshin Impact only as one of the video games focusing on yōkai in popular culture, but they do not contain any information about which company developed Genshin Impact. Therefore, there is not enough information to verify the claim.",
+      "cited": [],
+      "retried": false,
+      "first_pass": null
+    },
+    "expected": "SUPPORTS"
+  },
+  {
+    "claim": "Some scientists disagree about many things",
+    "label": "SUPPORTS",
+    "reasoning": "Passage 4 describes a controversy where two scientists, Camillo Golgi and Santiago Ramón y Cajal, disagreed with each other regarding their views of the neuron doctrine. This supports the claim that some scientists disagree about things.",
+    "cited": [
+      {
+        "id": "6f7ef7e8-5baa-5a2c-8e48-b26180a89309",
+        "path": "Santiago Ramón y Cajal > Distinctions",
+        "quote": "Golgi, a staunch supporter of reticular theory, disagreed with Ramón y Cajal in his view of the neuron doctrine.",
+        "verified": true
+      }
+    ],
+    "retried": true,
+    "first_pass": {
+      "claim": "Some scientists disagree about many things",
+      "label": "NOT ENOUGH INFO",
+      "reasoning": "The provided passages mention instances where scientists and researchers disagreed, such as Camillo Golgi disagreeing with Ramón y Cajal regarding the neuron doctrine in passage 4, but there is no information in the text to verify the broad claim that 'Some scientists disagree about many things'.",
+      "cited": [],
+      "retried": false,
+      "first_pass": null
+    },
+    "expected": "NOT ENOUGH INFO"
+  }
+]

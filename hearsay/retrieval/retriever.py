@@ -1,14 +1,12 @@
 from qdrant_client import QdrantClient, models
-from hearsay.config import qdrant_api, qdrant_url, collection_name, dense_embedding_model, sparse_embedding_model,dense_vector_name, sparse_vector_name
-from fastembed import TextEmbedding, SparseTextEmbedding
+from hearsay.config import qdrant_api, qdrant_url, collection_name, dense_vector_name, sparse_vector_name
+from hearsay.retrieval.indexer import dense_embedder, sparse_embedder
 
-client = QdrantClient(url=qdrant_url, api_key=qdrant_api)
+cloud_client = QdrantClient(url=qdrant_url, api_key=qdrant_api)
 
 
-dense_embedder = TextEmbedding(model_name=dense_embedding_model)
-sparse_embedder = SparseTextEmbedding(model_name=sparse_embedding_model)
 
-def search(claim, k = 5, candidates = 20):
+def search(claim, k = 5, candidates = 20, client = cloud_client, collection = collection_name):
     dense_embeddings = list(dense_embedder.query_embed([claim]))
     sparse_embeddings = list(sparse_embedder.query_embed([claim]))
 
@@ -19,7 +17,7 @@ def search(claim, k = 5, candidates = 20):
 
 
     results = client.query_points(
-        collection_name=collection_name,
+        collection_name=collection,
         prefetch=[
             models.Prefetch(query=dense_embeddings[0].tolist(), using=dense_vector_name, limit=candidates),
             models.Prefetch(query=sparse_vec, using=sparse_vector_name, limit=candidates),

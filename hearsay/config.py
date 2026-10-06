@@ -11,6 +11,7 @@ dense_embedding_model = "BAAI/bge-small-en-v1.5"
 sparse_embedding_model = "Qdrant/bm25"
 dense_vector_name = "bge_small"
 sparse_vector_name = "bm25"
+judge_model = "gemini-3.5-flash-lite"
 
 if gemini_api is None:
     raise ValueError("GEMINI_API_KEY is not set in the environment variables.") 
