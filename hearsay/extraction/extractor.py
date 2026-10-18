@@ -9,7 +9,6 @@ import json
 #    contents="Write a short story about a robot learning to love.")
 
 #print(response.text)
-text = "NASA's Voyager 1 spacecraft, launched on September 5, 1977, is currently more than 24 billion kilometers from Earth. It reached interstellar space in August 2012, becoming the first human-made object to do so. The spacecraft carries a Golden Record containing 116 images and a variety of sounds from Earth, and its radio signals currently take over 22 hours to reach Earth."
 groq_client = Groq(api_key=groq_api)
 
 def extract_statements(text):
@@ -38,7 +37,12 @@ def extract_statements(text):
     claims = json.loads(response_g.choices[0].message.content)
     return claims["statements"]
 
-extracted_statements = extract_statements(text)
-print("Extracted Statements:")
-for statement in extracted_statements:
-    print("-", statement)
+
+if __name__ == "__main__":
+
+    text = "NASA's Voyager 1 spacecraft, launched on September 5, 1977, is currently more than 24 billion kilometers from Earth. It reached interstellar space in August 2012, becoming the first human-made object to do so. The spacecraft carries a Golden Record containing 116 images and a variety of sounds from Earth, and its radio signals currently take over 22 hours to reach Earth."
+
+    extracted_statements = extract_statements(text)
+    print("Extracted Statements:")
+    for statement in extracted_statements:
+        print("-", statement)

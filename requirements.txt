@@ -4,3 +4,4 @@ groq
 nltk
 wikipedia-api
 qdrant-client[fastembed]
+langgraph
