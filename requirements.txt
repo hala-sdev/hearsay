@@ -5,3 +5,5 @@ nltk
 wikipedia-api
 qdrant-client[fastembed]
 langgraph
+ipykernel 
+pandas
