@@ -7,3 +7,8 @@ qdrant-client[fastembed]
 langgraph
 ipykernel 
 pandas
+fastapi[standard]
+scikit-learn
+psycopg[binary]
+sqlalchemy
+alembic
