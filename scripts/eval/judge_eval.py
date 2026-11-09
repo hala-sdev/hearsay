@@ -3,7 +3,7 @@ import json
 from hearsay.verification.verifier import verify_claim
 
 
-output_path = "eval/results/judge_results.jsonl"
+output_path = "eval/results/judge_results_v2.jsonl"
 
 LIMIT = None
 records = []
@@ -45,5 +45,5 @@ for row in records[:LIMIT]:
 
     print(row["id"], row["label"], result["label"])
 
-    with open("eval/results/judge_results.jsonl", "a", encoding="utf-8") as file:
+    with open(output_path, "a", encoding="utf-8") as file:
         file.write(json.dumps(per_claim[-1], ensure_ascii=False) + "\n")
