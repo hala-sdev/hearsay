@@ -12,3 +12,4 @@ scikit-learn
 psycopg[binary]
 sqlalchemy
 alembic
+langgraph-checkpoint-postgres
