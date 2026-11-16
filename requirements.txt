@@ -13,3 +13,4 @@ psycopg[binary]
 sqlalchemy
 alembic
 langgraph-checkpoint-postgres
+pytest

@@ -7,6 +7,11 @@ groq_api = os.getenv("GROQ_API_KEY")
 qdrant_api = os.getenv("QDRANT_API_KEY")
 qdrant_url = os.getenv("QDRANT_URL")
 db_url = os.getenv("DATABASE_URL")
+if not db_url:
+    raise ValueError("DATABASE_URL is not set in .env")
+if "connect_timeout" not in db_url:
+    db_url += "&connect_timeout=10"
+
 sqlalchemy_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 collection_name = "wiki_passages"
 dense_embedding_model = "BAAI/bge-small-en-v1.5"   
@@ -26,3 +31,8 @@ if qdrant_api is None:
 
 if qdrant_url is None:
     raise ValueError("QDRANT_URL is not set in the environment variables.")
+
+
+max_text_chars =1000
+checks_per_ip_per_hour = 5
+checks_per_day = 50

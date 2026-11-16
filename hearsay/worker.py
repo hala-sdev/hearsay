@@ -27,28 +27,26 @@ def run_check(check_id):
             for step in graph.stream(inputs, config=config, stream_mode = "updates"):
                 print(step)
                 if "Verify" in step:
-                    result = step["Verify"]["results"]
+                    results = step["Verify"]["results"]
 
-                    new_result = result[-1]
-                    index_result = len(result) - 1
-
+                    new_result = results[-1]
+                    index_result = len(results) - 1
+                    save_claim(check_id, index_result, new_result)
+                if "Extract" in step:
+                    total_claim = len(step["Extract"]["claims"])
                     with Session(engine) as session:
-                        claim = Claim(
-                            check_id=check_id,
-                            claim_index=index_result,
-                            claim=new_result["claim"],
-                            label=new_result["label"],
-                            reasoning=new_result["reasoning"],
-                            cited=new_result.get("cited", []),
-                            retried=new_result.get("retried", False),
-                            first_pass=new_result.get("first_pass")["label"] if new_result.get("first_pass") else None,
-                            warnings=new_result.get("warnings", {}),
-                        )
-                        session.add(claim)
+                        check = session.get(Check, check_id)
+                        check.total_claims = total_claim
                         session.commit()
+            final_results = graph.get_state(config).values["results"]
+            final_claims = graph.get_state(config).values["claims"]
+
+            for index, result in enumerate(final_results):
+                save_claim(check_id, index, result)
 
         with Session(engine) as session:
             check = session.get(Check, check_id)
+            check.total_claims = len(final_claims)
             check.status = "done"
             session.commit()
 
@@ -72,6 +70,22 @@ def claim_next():
             session.commit()
             return check.check_id
 
+def save_claim(check_id, index, result):
+    with Session(engine) as session:
+        claim = Claim(
+                    check_id=check_id,
+                    claim_index=index,
+                    claim=result["claim"],
+                    label=result["label"],
+                    reasoning=result["reasoning"],
+                    cited=result.get("cited", []),
+                    retried=result.get("retried", False),
+                    first_pass=result.get("first_pass")["label"] if result.get("first_pass") else None,
+                    warnings=result.get("warnings", {}),
+                    )
+        session.merge(claim)
+        session.commit()
+
 
 def requeue_stuck():
     with Session(engine) as session:
@@ -80,14 +94,16 @@ def requeue_stuck():
 
 async def worker_loop():
     while True:
-        check_id = await asyncio.to_thread(claim_next)
-        if check_id is None:
-            try:
-                await asyncio.wait_for(new_check.wait(), timeout=60)
-            except TimeoutError:
-                pass
-            new_check.clear()
-            continue
-        await asyncio.to_thread(run_check, check_id)
-
-
+        try:
+            check_id = await asyncio.to_thread(claim_next)
+            if check_id is None:
+                try:
+                    await asyncio.wait_for(new_check.wait(), timeout=3600)
+                except TimeoutError:
+                    pass
+                new_check.clear()
+                continue
+            await asyncio.to_thread(run_check, check_id)
+        except Exception as e:
+            print("worker error:", e)
+            await asyncio.sleep(5)
