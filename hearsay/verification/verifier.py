@@ -6,7 +6,7 @@ from google.genai import types
 from hearsay.config import gemini_api, judge_model
 from hearsay.retrieval.live_search import live_search
 from hearsay.verification.quotes import quote_handling
-from langfuse import observe
+from langfuse import observe, get_client
 
 client = genai.Client(api_key=gemini_api, http_options=types.HttpOptions(timeout=60000, 
                                                                         retry_options=types.HttpRetryOptions(attempts= 5, initial_delay= 5, http_status_codes= [408, 429, 500, 502, 503, 504])))
@@ -62,6 +62,13 @@ def ask_gemini(claim, passages):
             response_schema=VerificationResult,
             temperature=0,
         ),
+    )
+    get_client().update_current_generation(
+        model=judge_model,
+        usage_details={
+            "input": response.usage_metadata.prompt_token_count,
+            "output": response.usage_metadata.candidates_token_count,
+        },
     )
     return response.parsed    
 

@@ -2,7 +2,7 @@
 from hearsay.config import gemini_api, groq_api
 from groq import Groq
 import json
-from langfuse import observe
+from langfuse import observe, get_client
 
 groq_client = Groq(api_key=groq_api)
 @observe(as_type="generation")
@@ -29,6 +29,13 @@ def extract_statements(text):
                                 }},
                                 "required": ["statements"]}}}
                                 )
+    get_client().update_current_generation(
+        model="openai/gpt-oss-120b",
+        usage_details={
+            "input": response_g.usage.prompt_tokens,
+            "output": response_g.usage.completion_tokens,
+        },
+    )
     claims = json.loads(response_g.choices[0].message.content)
     return claims["statements"]
 
