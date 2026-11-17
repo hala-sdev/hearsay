@@ -6,6 +6,10 @@ from hearsay.db.models import Check, Claim
 from hearsay.db.session import engine
 from sqlalchemy import select, update
 import asyncio
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 new_check = asyncio.Event()
 def run_check(check_id):
     with Session(engine) as session:
@@ -13,6 +17,7 @@ def run_check(check_id):
         text = check.text
 
     try:
+        start = time.monotonic()
         with PostgresSaver.from_conn_string(db_url) as checkpointer:
 
             graph = builder.compile(checkpointer=checkpointer)
@@ -25,7 +30,7 @@ def run_check(check_id):
             state = graph.get_state(config)
             inputs = None if state.next else starting
             for step in graph.stream(inputs, config=config, stream_mode = "updates"):
-                print(step)
+                logger.debug("check %s step %s", check_id, list(step.keys()))
                 if "Verify" in step:
                     results = step["Verify"]["results"]
 
@@ -49,13 +54,15 @@ def run_check(check_id):
             check.total_claims = len(final_claims)
             check.status = "done"
             session.commit()
+            logger.info("check %s done: %d claims in %.1fs", check_id, len(final_claims), time.monotonic() - start)
+            
 
     except Exception as e:
         with Session(engine) as session:
             check = session.get(Check, check_id)
             check.status = "error"
             check.error = str(e)
-            print(check.error)
+            logger.exception("check %s failed", check_id)
             session.commit()
 
 def claim_next():
@@ -69,6 +76,7 @@ def claim_next():
             check.status = "running"
             check.attempts +=1
             session.commit()
+            logger.info("claimed check %s (attempt %d)", check.check_id, check.attempts)
             return check.check_id
 
 def save_claim(check_id, index, result):
@@ -90,15 +98,21 @@ def save_claim(check_id, index, result):
 
 def requeue_stuck():
     with Session(engine) as session:
-
-        session.execute(update(Check)
+        gave_up = session.execute(
+            update(Check)
             .where(Check.status == "running", Check.attempts >= max_attempts)
-            .values(status="error", error=f"Gave up after {max_attempts} attempts"))
-        
-        session.execute(update(Check)
+            .values(status="error", error=f"Gave up after {max_attempts} attempts")
+        ).rowcount
+        requeued = session.execute(
+            update(Check)
             .where(Check.status == "running")
-            .values(status="queued"))
+            .values(status="queued")
+        ).rowcount
         session.commit()
+    if gave_up:
+        logger.warning("gave up on %d checks after %d attempts", gave_up, max_attempts)
+    if requeued:
+        logger.info("requeued %d stuck checks", requeued)
 
 async def worker_loop():
     while True:
@@ -113,5 +127,5 @@ async def worker_loop():
                 continue
             await asyncio.to_thread(run_check, check_id)
         except Exception as e:
-            print("worker error:", e)
+            logger.exception("worker loop failed")
             await asyncio.sleep(5)

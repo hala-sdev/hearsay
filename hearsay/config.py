@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+log_level = os.getenv("LOG_LEVEL", "INFO")
 gemini_api = os.getenv("GEMINI_API_KEY")
 groq_api = os.getenv("GROQ_API_KEY")
 qdrant_api = os.getenv("QDRANT_API_KEY")

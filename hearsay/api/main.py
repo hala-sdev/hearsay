@@ -11,6 +11,18 @@ from hearsay.db.models import Check, Claim
 from hearsay.config import max_text_chars, checks_per_ip_per_hour, checks_per_day
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
+import logging
+from hearsay.config import log_level
+
+logging.basicConfig(
+    level=log_level,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    force=True,
+)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx2").setLevel(logging.WARNING)
+logging.getLogger("google_genai").setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app):
