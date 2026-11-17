@@ -17,7 +17,7 @@ def create_collection(client, collection_name):
 
 def upload_passages(client, collection_name, passages):
     texts = [f"{p['path']}: {p['text']}" for p in passages]
-    dense_embeddings = list(dense_embedder.embed(texts))
+    dense_embeddings = list(dense_embedder.embed(texts, batch_size=2))
     sparse_embeddings = list(sparse_embedder.embed(texts))
     combined_embeddings = []
     for fetched_p, sparse, dense in zip(passages, sparse_embeddings, dense_embeddings):
