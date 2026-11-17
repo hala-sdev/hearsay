@@ -1,9 +1,7 @@
 import wikipediaapi
 from nltk.tokenize import sent_tokenize
 import uuid
-import nltk
 
-nltk.download('punkt_tab')
 wiki = wikipediaapi.Wikipedia(user_agent='hearsay (https://github.com/hala-sdev?tab=repositories)', language='en', extract_format=wikipediaapi.ExtractFormat.WIKI)
 ignored_sections = ["See also", "References", "External links", "Further reading", "Notes"]
 def wiki_search(title):
