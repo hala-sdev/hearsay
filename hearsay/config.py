@@ -35,6 +35,6 @@ if qdrant_url is None:
 
 
 max_text_chars =1000
-checks_per_ip_per_hour = 5
-checks_per_day = 50
+checks_per_ip_per_hour = int(os.getenv("CHECKS_PER_IP_PER_HOUR", "5"))
+checks_per_day = int(os.getenv("CHECKS_PER_DAY", "50"))
 max_attempts = 3

@@ -8,9 +8,12 @@ from sqlalchemy import select, update
 import asyncio
 import logging
 import time
+from langfuse import observe
 
 logger = logging.getLogger(__name__)
 new_check = asyncio.Event()
+
+@observe(name="check")
 def run_check(check_id):
     with Session(engine) as session:
         check = session.get(Check, check_id)

@@ -4,7 +4,7 @@ os.environ["DATABASE_URL"] = os.environ.get(
     "TEST_DATABASE_URL",
     "postgresql://postgres:test@localhost:5433/hearsay_test?sslmode=disable",
 )
-
+os.environ["LANGFUSE_TRACING_ENABLED"] = "false"
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import delete

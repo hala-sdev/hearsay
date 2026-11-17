@@ -2,15 +2,10 @@
 from hearsay.config import gemini_api, groq_api
 from groq import Groq
 import json
-#client = genai.Client(api_key=gemini_api)
+from langfuse import observe
 
-#response = client.models.generate_content(
-#    model="gemini-3.6-flash",
-#    contents="Write a short story about a robot learning to love.")
-
-#print(response.text)
 groq_client = Groq(api_key=groq_api)
-
+@observe(as_type="generation")
 def extract_statements(text):
     response_g = groq_client.chat.completions.create(
         messages=[

@@ -13,7 +13,7 @@ from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 import logging
 from hearsay.config import log_level
-
+from langfuse import get_client
 logging.basicConfig(
     level=log_level,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -22,6 +22,7 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpx2").setLevel(logging.WARNING)
 logging.getLogger("google_genai").setLevel(logging.WARNING)
+logging.getLogger("wikipediaapi").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
@@ -30,6 +31,7 @@ async def lifespan(app):
     task = asyncio.create_task(worker_loop())
     yield
     task.cancel()
+    get_client().shutdown()
 
 app = FastAPI(lifespan=lifespan)
 

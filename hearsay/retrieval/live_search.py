@@ -2,7 +2,8 @@ from hearsay.retrieval.wiki_passages import get_passages, wiki
 from hearsay.retrieval.indexer import create_collection, upload_passages
 from qdrant_client import QdrantClient
 from hearsay.retrieval.retriever import search
-
+from langfuse import observe
+@observe()
 def live_search(claim):
     result = wiki.search(claim, limit=2)
     all_passages = []
