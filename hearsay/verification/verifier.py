@@ -50,7 +50,7 @@ def error_result(claim, message):
     return {"claim": claim, "label": "ERROR", "reasoning": message, "cited": []}
 
 
-def ask_gemini(client, passages):
+def ask_gemini(claim, passages):
     response = client.models.generate_content(
         model=judge_model,
         contents=f"Claim: {claim}\nEvidence: {format_evidence(passages)}",
