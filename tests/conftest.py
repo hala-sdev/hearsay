@@ -16,9 +16,13 @@ from hearsay.db.session import engine
 
 
 @pytest.fixture
-def client():
+def clean_db():
     with Session(engine) as session:
         session.execute(delete(Claim))
         session.execute(delete(Check))
         session.commit()
+
+
+@pytest.fixture
+def client(clean_db):
     return TestClient(app)

@@ -1,5 +1,5 @@
 from hearsay.pipeline import builder
-from hearsay.config import db_url
+from hearsay.config import db_url, max_attempts
 from langgraph.checkpoint.postgres import PostgresSaver
 from sqlalchemy.orm import Session
 from hearsay.db.models import Check, Claim
@@ -67,6 +67,7 @@ def claim_next():
             return None
         else:
             check.status = "running"
+            check.attempts +=1
             session.commit()
             return check.check_id
 
@@ -89,7 +90,14 @@ def save_claim(check_id, index, result):
 
 def requeue_stuck():
     with Session(engine) as session:
-        session.execute(update(Check).where(Check.status == "running").values(status="queued"))
+
+        session.execute(update(Check)
+            .where(Check.status == "running", Check.attempts >= max_attempts)
+            .values(status="error", error=f"Gave up after {max_attempts} attempts"))
+        
+        session.execute(update(Check)
+            .where(Check.status == "running")
+            .values(status="queued"))
         session.commit()
 
 async def worker_loop():

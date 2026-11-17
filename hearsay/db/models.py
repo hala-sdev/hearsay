@@ -17,6 +17,7 @@ class Check(Base):
     error: Mapped[str | None] = mapped_column(Text)
     total_claims:  Mapped[int | None] = mapped_column()
     client_ip: Mapped[str | None] = mapped_column(Text)
+    attempts: Mapped[int] = mapped_column(server_default="0")
     __table_args__ = (
         CheckConstraint("status IN ('queued', 'running', 'done', 'error')", name="status_check"),
     )

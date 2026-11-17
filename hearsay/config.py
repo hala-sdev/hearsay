@@ -36,3 +36,4 @@ if qdrant_url is None:
 max_text_chars =1000
 checks_per_ip_per_hour = 5
 checks_per_day = 50
+max_attempts = 3
