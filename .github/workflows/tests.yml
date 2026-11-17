@@ -27,6 +27,8 @@ jobs:
       DATABASE_URL: postgresql://postgres:test@localhost:5433/hearsay_test?sslmode=disable
       GEMINI_API_KEY: not-a-real-key
       GROQ_API_KEY: not-a-real-key
+      QDRANT_API_KEY: not-a-real-key
+      QDRANT_URL: http://localhost:6333
 
     steps:
       - uses: actions/checkout@v7
