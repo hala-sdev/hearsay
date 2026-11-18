@@ -3,50 +3,266 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hearsay: fact-check a paragraph</title>
+  <title>Hearsay: check a paragraph against Wikipedia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
-    textarea { width: 100%; height: 140px; font: inherit; padding: 8px; box-sizing: border-box; }
-    button { margin-top: 8px; padding: 8px 20px; font: inherit; cursor: pointer; }
-    button:disabled { cursor: wait; opacity: 0.6; }
-    #status { margin: 16px 0; color: #555; }
-    .claim { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-    .label { font-weight: bold; }
-    .SUPPORTS { color: #1a7f37; }
-    .REFUTES { color: #cf222e; }
-    .NOT-ENOUGH-INFO, .ERROR { color: #9a6700; }
-    .quote { color: #555; font-style: italic; margin-top: 4px; }
-    footer { margin-top: 32px; font-size: 0.85em; color: #777; }
+    :root {
+      --desk: #e9edf1;
+      --page: #ffffff;
+      --ink: #1b2430;
+      --muted: #5b6675;
+      --rule: #d9dfe6;
+      --focus: #2b6cb0;
+      --green: #1e6b34; --green-hl: #bdf0c2;
+      --red: #a4162a;   --red-hl: #ffc7cf;
+      --amber: #7a5b00; --amber-hl: #ffeb99;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --desk: #151a21;
+        --page: #1d232c;
+        --ink: #e7ecf2;
+        --muted: #9aa6b4;
+        --rule: #2e3742;
+        --focus: #7fb3f0;
+        --green: #7ddb8c; --green-hl: rgba(125, 219, 140, 0.28);
+        --red: #ff8a99;   --red-hl: rgba(255, 138, 153, 0.28);
+        --amber: #f2cc5b; --amber-hl: rgba(242, 204, 91, 0.28);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--desk);
+      color: var(--ink);
+      font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 56px auto;
+      padding: 40px 44px;
+      background: var(--page);
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+    }
+
+    h1 {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 600;
+      font-size: 2.75rem;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin: 0 0 12px;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin: 0 0 28px;
+      max-width: 34em;
+    }
+
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      resize: vertical;
+      padding: 14px 16px;
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--page);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+    }
+    textarea::placeholder { color: var(--muted); opacity: 0.7; }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 20px;
+      margin-top: 12px;
+    }
+
+    .samples { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    .samples button {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: var(--rule);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+    .samples button:hover { text-decoration-color: var(--ink); }
+
+    #check {
+      background: var(--ink);
+      color: var(--page);
+      border: none;
+      border-radius: 8px;
+      padding: 11px 20px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #check:disabled { opacity: 0.55; cursor: wait; }
+
+    textarea:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    #status { margin: 28px 0 4px; min-height: 1.55em; color: var(--muted); }
+
+    .result { padding: 18px 0; border-top: 1px solid var(--rule); }
+    .result.SUPPORTS { --hl: var(--green-hl); --tone: var(--green); }
+    .result.REFUTES { --hl: var(--red-hl); --tone: var(--red); }
+    .result.NOT-ENOUGH-INFO,
+    .result.ERROR { --hl: var(--amber-hl); --tone: var(--amber); }
+
+    .verdict { margin: 0 0 4px; font-weight: 700; font-size: 0.95rem; color: var(--tone); }
+
+    .claim {
+      margin: 0;
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.3rem;
+      line-height: 1.45;
+    }
+    .claim span {
+      padding: 0 2px;
+      background-image: linear-gradient(var(--hl), var(--hl));
+      background-repeat: no-repeat;
+      background-position: 0 88%;
+      background-size: 100% 42%;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      animation: mark 0.6s ease-out both;
+    }
+    @keyframes mark {
+      from { background-size: 0% 42%; }
+      to   { background-size: 100% 42%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .claim span { animation: none; }
+    }
+
+    .why { margin: 6px 0 0; color: var(--muted); }
+
+    .source {
+      margin: 12px 0 0;
+      padding-left: 14px;
+      border-left: 2px solid var(--rule);
+      font-family: "Newsreader", Georgia, serif;
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+    .source cite {
+      display: block;
+      margin-top: 2px;
+      font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+      font-style: normal;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .how { margin: 36px 0 0; color: var(--muted); font-size: 0.95rem; max-width: 36em; }
+    .how strong { color: var(--ink); }
+
+    footer { margin-top: 20px; font-size: 0.9rem; color: var(--muted); }
+    footer a { color: var(--ink); text-underline-offset: 3px; }
+
+    @media (max-width: 760px) {
+      .page { margin: 0; border: none; border-radius: 0; padding: 28px 20px; }
+      h1 { font-size: 2.25rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>Hearsay</h1>
-  <p>Paste a paragraph. Hearsay splits it into claims and checks each one against Wikipedia, quoting its evidence.</p>
+  <main class="page">
+    <h1>Hearsay</h1>
+    <p class="lede">Paste a paragraph and Hearsay checks each claim against Wikipedia. Every verdict comes with the sentence it is based on.</p>
 
-  <textarea id="text" maxlength="1000" placeholder="e.g. The Nile is the longest river in Africa."></textarea>
-  <button id="check">Check</button>
+    <label for="text" class="visually-hidden">Text to check</label>
+    <textarea id="text" maxlength="1000" placeholder="The Nile is the longest river in Africa."></textarea>
 
-  <div id="status"></div>
-  <div id="results"></div>
+    <div class="row">
+      <p class="samples">
+        Or try one:
+        <button class="sample" data-text="Goldfish only have a three-second memory.">goldfish memory</button>
+        or
+        <button class="sample" data-text="The Great Pyramid of Giza was built for the pharaoh Ramesses II.">who the Great Pyramid was built for</button>.
+      </p>
+      <button id="check">Check this text</button>
+    </div>
 
+    <p id="status" role="status"></p>
+    <div id="results"></div>
+
+    <p class="how" id="how">
+      <strong>How it works.</strong>
+      A language model splits your text into single claims. Each claim is matched against Wikipedia passages,
+      or searched live if nothing fits and a second model gives a verdict that has to quote its source.
+      Quotes are checked against the original article before they are shown.
+    </p>
+
+  </main>
 
 <script>
 const textBox = document.getElementById("text");
 const button = document.getElementById("check");
 const statusBox = document.getElementById("status");
 const results = document.getElementById("results");
+const how = document.getElementById("how");
+
+const VERDICTS = {
+  "SUPPORTS": "Supported",
+  "REFUTES": "Contradicted",
+  "NOT ENOUGH INFO": "Not enough evidence",
+  "ERROR": "Couldn’t check",
+};
+
+let shown = 0;
 
 button.addEventListener("click", startCheck);
+
+for (const sample of document.querySelectorAll("button.sample")) {
+  sample.addEventListener("click", () => {
+    textBox.value = sample.dataset.text;
+    textBox.focus();
+  });
+}
 
 async function startCheck() {
   const text = textBox.value.trim();
   if (!text) {
-    statusBox.textContent = "Please paste some text first.";
+    statusBox.textContent = "Paste some text first, or pick a sample.";
     return;
   }
   button.disabled = true;
+  how.hidden = true;
   results.textContent = "";
-  statusBox.textContent = "Sending… (if Hearsay was asleep, this can take about a minute)";
+  shown = 0;
+  statusBox.textContent = "Sending… if Hearsay was asleep, this takes a few seconds.";
 
   try {
     const response = await fetch("/checks", {
@@ -62,7 +278,7 @@ async function startCheck() {
     const data = await response.json();
     poll(data.check_id);
   } catch (err) {
-    statusBox.textContent = "Could not reach Hearsay. It may be waking up, so try again in a minute.";
+    statusBox.textContent = "Hearsay didn’t answer. It may be waking up, so try again in a minute.";
     button.disabled = false;
   }
 }
@@ -75,17 +291,18 @@ async function poll(checkId) {
       showClaims(data.claims);
 
       if (data.status === "done") {
-        statusBox.textContent = `Done: ${data.total_claims} claims checked.`;
+        const n = data.total_claims;
+        statusBox.textContent = `Checked ${n} ${n === 1 ? "claim" : "claims"}.`;
         button.disabled = false;
         return;
       }
       if (data.status === "error") {
-        statusBox.textContent = "Something went wrong with this check. Please try again later.";
+        statusBox.textContent = "This check stopped before it finished. Try again in a few minutes.";
         button.disabled = false;
         return;
       }
       statusBox.textContent = data.total_claims
-        ? `Checking… ${data.done_claims} of ${data.total_claims} claims done`
+        ? `Checking claim ${Math.min(data.done_claims + 1, data.total_claims)} of ${data.total_claims}…`
         : "Reading your text…";
     } else if (response.status < 500) {
       statusBox.textContent = "This check could not be found.";
@@ -93,7 +310,7 @@ async function poll(checkId) {
       return;
     }
   } catch (err) {
-    statusBox.textContent = "Connection hiccup, retrying…";
+    statusBox.textContent = "Lost the connection for a moment. Retrying…";
   }
   setTimeout(() => poll(checkId), 2000);
 }
@@ -103,7 +320,7 @@ async function showError(response) {
     const data = await response.json();
     statusBox.textContent = data.detail;
   } else if (response.status === 422) {
-    statusBox.textContent = "Text must be between 1 and 1000 characters.";
+    statusBox.textContent = "The text has to be between 1 and 1000 characters.";
   } else if (response.status >= 500) {
     statusBox.textContent = "Hearsay is waking up or busy. Try again in a minute.";
   } else {
@@ -112,31 +329,38 @@ async function showError(response) {
 }
 
 function showClaims(claims) {
-  results.textContent = "";
-  for (const c of claims) {
-    const box = document.createElement("div");
-    box.className = "claim";
+  for (const c of claims.slice(shown)) {
+    const item = document.createElement("article");
+    item.className = "result " + c.label.replaceAll(" ", "-");
 
-    const label = document.createElement("div");
-    label.className = "label " + c.label.replaceAll(" ", "-");
-    label.textContent = c.label;
+    const verdict = document.createElement("p");
+    verdict.className = "verdict";
+    verdict.textContent = VERDICTS[c.label] ?? c.label;
 
-    const claimText = document.createElement("div");
-    claimText.textContent = c.claim;
+    const claim = document.createElement("p");
+    claim.className = "claim";
+    const marked = document.createElement("span");
+    marked.textContent = c.claim;
+    claim.append(marked);
 
-    const reasoning = document.createElement("div");
-    reasoning.textContent = c.reasoning;
+    const why = document.createElement("p");
+    why.className = "why";
+    why.textContent = c.reasoning;
 
-    box.append(label, claimText, reasoning);
+    item.append(verdict, claim, why);
 
     for (const q of c.cited) {
-      const quote = document.createElement("div");
-      quote.className = "quote";
-      quote.textContent = `"${q.quote}" (${q.path})`;
-      box.append(quote);
+      const source = document.createElement("blockquote");
+      source.className = "source";
+      source.textContent = `“${q.quote}”`;
+      const cite = document.createElement("cite");
+      cite.textContent = "Wikipedia: " + q.path.replaceAll(" > ", ", ");
+      source.append(cite);
+      item.append(source);
     }
-    results.append(box);
+    results.append(item);
   }
+  shown = claims.length;
 }
 </script>
 </body>
