@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hearsay: fact-check a paragraph</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
+    textarea { width: 100%; height: 140px; font: inherit; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 8px; padding: 8px 20px; font: inherit; cursor: pointer; }
+    button:disabled { cursor: wait; opacity: 0.6; }
+    #status { margin: 16px 0; color: #555; }
+    .claim { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+    .label { font-weight: bold; }
+    .SUPPORTS { color: #1a7f37; }
+    .REFUTES { color: #cf222e; }
+    .NOT-ENOUGH-INFO, .ERROR { color: #9a6700; }
+    .quote { color: #555; font-style: italic; margin-top: 4px; }
+    footer { margin-top: 32px; font-size: 0.85em; color: #777; }
+  </style>
+</head>
+<body>
+  <h1>Hearsay</h1>
+  <p>Paste a paragraph. Hearsay splits it into claims and checks each one against Wikipedia, quoting its evidence.</p>
+
+  <textarea id="text" maxlength="1000" placeholder="e.g. The Nile is the longest river in Africa."></textarea>
+  <button id="check">Check</button>
+
+  <div id="status"></div>
+  <div id="results"></div>
+
+
+<script>
+const textBox = document.getElementById("text");
+const button = document.getElementById("check");
+const statusBox = document.getElementById("status");
+const results = document.getElementById("results");
+
+button.addEventListener("click", startCheck);
+
+async function startCheck() {
+  const text = textBox.value.trim();
+  if (!text) {
+    statusBox.textContent = "Please paste some text first.";
+    return;
+  }
+  button.disabled = true;
+  results.textContent = "";
+  statusBox.textContent = "Sending… (if Hearsay was asleep, this can take about a minute)";
+
+  try {
+    const response = await fetch("/checks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text }),
+    });
+    if (!response.ok) {
+      await showError(response);
+      button.disabled = false;
+      return;
+    }
+    const data = await response.json();
+    poll(data.check_id);
+  } catch (err) {
+    statusBox.textContent = "Could not reach Hearsay. It may be waking up, so try again in a minute.";
+    button.disabled = false;
+  }
+}
+
+async function poll(checkId) {
+  try {
+    const response = await fetch(`/checks/${checkId}`);
+    if (response.ok) {
+      const data = await response.json();
+      showClaims(data.claims);
+
+      if (data.status === "done") {
+        statusBox.textContent = `Done: ${data.total_claims} claims checked.`;
+        button.disabled = false;
+        return;
+      }
+      if (data.status === "error") {
+        statusBox.textContent = "Something went wrong with this check. Please try again later.";
+        button.disabled = false;
+        return;
+      }
+      statusBox.textContent = data.total_claims
+        ? `Checking… ${data.done_claims} of ${data.total_claims} claims done`
+        : "Reading your text…";
+    } else if (response.status < 500) {
+      statusBox.textContent = "This check could not be found.";
+      button.disabled = false;
+      return;
+    }
+  } catch (err) {
+    statusBox.textContent = "Connection hiccup, retrying…";
+  }
+  setTimeout(() => poll(checkId), 2000);
+}
+
+async function showError(response) {
+  if (response.status === 429) {
+    const data = await response.json();
+    statusBox.textContent = data.detail;
+  } else if (response.status === 422) {
+    statusBox.textContent = "Text must be between 1 and 1000 characters.";
+  } else if (response.status >= 500) {
+    statusBox.textContent = "Hearsay is waking up or busy. Try again in a minute.";
+  } else {
+    statusBox.textContent = `Unexpected error (${response.status}).`;
+  }
+}
+
+function showClaims(claims) {
+  results.textContent = "";
+  for (const c of claims) {
+    const box = document.createElement("div");
+    box.className = "claim";
+
+    const label = document.createElement("div");
+    label.className = "label " + c.label.replaceAll(" ", "-");
+    label.textContent = c.label;
+
+    const claimText = document.createElement("div");
+    claimText.textContent = c.claim;
+
+    const reasoning = document.createElement("div");
+    reasoning.textContent = c.reasoning;
+
+    box.append(label, claimText, reasoning);
+
+    for (const q of c.cited) {
+      const quote = document.createElement("div");
+      quote.className = "quote";
+      quote.textContent = `"${q.quote}" (${q.path})`;
+      box.append(quote);
+    }
+    results.append(box);
+  }
+}
+</script>
+</body>
+</html>

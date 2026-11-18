@@ -14,6 +14,8 @@ from datetime import datetime, timedelta, timezone
 import logging
 from hearsay.config import log_level
 from langfuse import get_client
+from fastapi.responses import FileResponse
+
 logging.basicConfig(
     level=log_level,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -43,6 +45,10 @@ class CheckRequest(BaseModel):
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/",  include_in_schema=False)
+def home():
+    return FileResponse("hearsay/static/demo.html")
 
 def save_check(text, ip):
     with Session(engine) as session:
