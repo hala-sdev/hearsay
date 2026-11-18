@@ -1,8 +1,19 @@
 from hearsay.config import dense_embedding_model, sparse_embedding_model, dense_vector_name, sparse_vector_name
-from fastembed import TextEmbedding, SparseTextEmbedding
 from qdrant_client import models
-dense_embedder = TextEmbedding(model_name=dense_embedding_model)
-sparse_embedder = SparseTextEmbedding(model_name=sparse_embedding_model)
+from functools import lru_cache
+
+
+@lru_cache(maxsize=1)
+def get_dense_embedder():
+    from fastembed import TextEmbedding
+    return TextEmbedding(model_name=dense_embedding_model)
+
+
+@lru_cache(maxsize=1)
+def get_sparse_embedder():
+    from fastembed import SparseTextEmbedding
+    return SparseTextEmbedding(model_name=sparse_embedding_model)
+
 
 def create_collection(client, collection_name):
     if not client.collection_exists(collection_name):
@@ -17,8 +28,8 @@ def create_collection(client, collection_name):
 
 def upload_passages(client, collection_name, passages):
     texts = [f"{p['path']}: {p['text']}" for p in passages]
-    dense_embeddings = list(dense_embedder.embed(texts, batch_size=2))
-    sparse_embeddings = list(sparse_embedder.embed(texts))
+    dense_embeddings = list(get_dense_embedder().embed(texts, batch_size=2))
+    sparse_embeddings = list(get_sparse_embedder().embed(texts))
     combined_embeddings = []
     for fetched_p, sparse, dense in zip(passages, sparse_embeddings, dense_embeddings):
         sparse_vec = models.SparseVector(

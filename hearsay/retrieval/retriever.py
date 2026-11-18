@@ -1,14 +1,14 @@
 from qdrant_client import QdrantClient, models
 from hearsay.config import qdrant_api, qdrant_url, collection_name, dense_vector_name, sparse_vector_name
-from hearsay.retrieval.indexer import dense_embedder, sparse_embedder
 from langfuse import observe
+from hearsay.retrieval.indexer import get_dense_embedder, get_sparse_embedder
 cloud_client = QdrantClient(url=qdrant_url, api_key=qdrant_api, timeout=60)
 
 
 @observe()
 def search(claim, k = 5, candidates = 20, client = cloud_client, collection = collection_name):
-    dense_embeddings = list(dense_embedder.query_embed([claim]))
-    sparse_embeddings = list(sparse_embedder.query_embed([claim]))
+    dense_embeddings = list(get_dense_embedder().query_embed([claim]))
+    sparse_embeddings = list(get_sparse_embedder().query_embed([claim]))
 
 
     sparse_vec = models.SparseVector(

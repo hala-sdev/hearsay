@@ -9,6 +9,7 @@ import asyncio
 import logging
 import time
 from langfuse import observe
+from hearsay.retrieval.indexer import get_dense_embedder, get_sparse_embedder
 
 logger = logging.getLogger(__name__)
 new_check = asyncio.Event()
@@ -118,6 +119,12 @@ def requeue_stuck():
         logger.info("requeued %d stuck checks", requeued)
 
 async def worker_loop():
+    try:
+        await asyncio.to_thread(get_dense_embedder)
+        await asyncio.to_thread(get_sparse_embedder)
+        logger.info("models loaded")
+    except Exception:
+        logger.exception("model warm-up failed")
     while True:
         try:
             check_id = await asyncio.to_thread(claim_next)
