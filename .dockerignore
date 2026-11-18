@@ -10,3 +10,4 @@ scripts/
 .ipynb_checkpoints/
 data/
 eval/
+mcp_server/
