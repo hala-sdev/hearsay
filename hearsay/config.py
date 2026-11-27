@@ -11,7 +11,7 @@ db_url = os.getenv("DATABASE_URL")
 if not db_url:
     raise ValueError("DATABASE_URL is not set in .env")
 if "connect_timeout" not in db_url:
-    db_url += "&connect_timeout=10"
+    db_url += ("&" if "?" in db_url else "?") + "connect_timeout=10"
 
 sqlalchemy_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 collection_name = "wiki_passages"
