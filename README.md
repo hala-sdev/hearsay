@@ -1,6 +1,6 @@
 # Hearsay
 
-Hearsay is a fact-checking engine. You paste a paragraph, it extracts the individual claims, and verifies each one against Wikipedia. Each claim is labeled Supported, Contradicted, or Not enough evidence, and every verdict cites the exact Wikipedia passage it is based on.
+Hearsay is a fact-checking engine. You paste a paragraph and it extracts the individual claims and verifies each one against Wikipedia. Each claim is labeled Supported, Contradicted, or Not enough evidence, and every verdict cites the exact Wikipedia passage it is based on.
 
 **[Live demo](https://hearsay-production.up.railway.app)** · [How it works](#how-it-works) · [Evaluation](#evaluation)
 
@@ -10,17 +10,17 @@ Hearsay is a fact-checking engine. You paste a paragraph, it extracts the indivi
 
 ## Motivation
 
-LLMs can hallucinate, stating false information with full confidence. I wanted a system that grounds every verdict in a real source and abstains when the evidence isn't there, instead of guessing.
+LLMs can hallucinate, stating false information with full confidence. I wanted a system that grounds every verdict in a real source and abstains when the evidence isn't there, instead of guessing the answer.
 
-Hearsay can be used directly, or as a verification layer on top of another AI system. It includes an MCP server, so AI assistants like Claude can call it as a tool.
+Hearsay can be used directly or as a verification layer on top of another AI system. It includes an MCP server, so AI assistants like Claude can call it as a tool if needed.
 
 ## How it works
 
-1. **Claim extraction.** An LLM (gpt-oss-120b on Groq) splits the input text into single, checkable claims.
-2. **Retrieval.** Each claim is searched in a Wikipedia index in Qdrant using hybrid search (dense embeddings for meaning, BM25 for keywords).
-3. **Verification.** A judge LLM (Gemini) labels the claim based on the retrieved passages, and must quote the sentences it relied on.
-4. **Live search fallback.** If the judge returns Not enough evidence, Hearsay searches live Wikipedia and runs the judge again. The index keeps most checks fast and cheap, and the live search covers what the index is missing.
-5. **Quote verification.** Before results are shown, every quote is checked in code against the source passage. The LLM does not decide this. If none of the quotes can be verified, the verdict is downgraded to Not enough evidence.
+1. **Claim extraction:** An LLM (gpt-oss-120b on Groq) splits the input text into single, checkable claims.
+2. **Retrieval:** Each claim is searched in a Wikipedia index in Qdrant using hybrid search (dense embeddings for meaning, BM25 for keywords).
+3. **Verification:** A judge LLM (Gemini) labels the claim based on the retrieved passages, and must quote the sentences it relied on.
+4. **Live search fallback:** If the judge returns Not enough evidence, Hearsay searches live Wikipedia and runs the judge again. The index keeps most checks fast and cheap, and the live search covers what the index is missing.
+5. **Quote verification:** Before results are shown, every quote is checked in code against the source passage. The LLM does not decide this. If none of the quotes can be verified, the verdict is downgraded to Not enough evidence.
 
 In evaluation, 98.6% of the quotes returned by the judge were found in the source text.
 
@@ -28,7 +28,7 @@ In evaluation, 98.6% of the quotes returned by the judge were found in the sourc
 
 - The demo allows 5 checks per hour. A single check can include a full paragraph with several claims.
 - It runs on free-tier hosting, so the first request after a period of inactivity can take a few seconds.
-- Try a claim you've always believed but never verified. Mine was that goldfish have a three-second memory. They don't.
+- Try a claim you've always believed but never verified. Mine was that goldfish have a three second memory. They don't.
 
 ## Evaluation
 
@@ -45,15 +45,15 @@ I went through all 42 mistakes by hand. 24 of them were FEVER labels that were w
 
 ## Engineering notes
 
-- **Out of memory.** In a local test with the free tier's 512 MB limit, the container was killed during live search. Embedding 40 passages in one batch added about 110 MB. Batches of 2 brought that down to about 20 MB.
-- **Cold start.** After sleeping, the server took 34 seconds to start, because it loaded everything, including the models, before it could accept requests. Loading the models in the background after startup brought it down to about 3 seconds.
-- **Tracing.** Langfuse traces showed that the judge model takes about 84% of each check (26 of 31 seconds), while search and claim extraction take under a second each. Since a check takes around 30 seconds, the API returns a check ID straight away and the page shows each claim's result as it's ready.
+- **Out of memory:** In a local test with the free tier's 512 MB limit, the container was killed during live search. Embedding 40 passages in one batch added about 110 MB. Batches of 2 brought that down to about 20 MB.
+- **Cold start:** After sleeping, the server took 34 seconds to start, because it loaded everything, including the models, before it could accept requests. Loading the models in the background after startup brought it down to about 3 seconds.
+- **Tracing:** Langfuse traces showed that the judge model takes about 84% of each check (26 of 31 seconds), while search and claim extraction take under a second each. Since a check takes around 30 seconds, the API returns a check ID straight away and the page shows each claim's result as it's ready.
 
 ## Limitations and next steps
 
-- **Wikipedia only, in English.** The same pipeline could check against other trusted sources.
+- **Wikipedia as the only source and in English:** The same pipeline could check against other trusted sources.
 - **Retrieval can miss the right article**, so some claims come back Not enough evidence even when Wikipedia covers them. Next step: better live-search queries and fetching more than two pages.
-- **Verdicts can vary between runs.** In a second evaluation run, 11 of 122 labels changed. Next step: run the judge more than once and take the majority verdict.
+- **Label can vary between runs:** In a second evaluation run, 11 of 122 labels changed. Next step: run the judge more than once and take the majority verdict.
 
 ## Running it locally
 
